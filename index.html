@@ -1,0 +1,56 @@
+<meta charset=utf-8>
+<script>
+
+/** Random WebGL Fragment Shader Generator **/
+
+// The fragment sets gl_FragColor
+seed = "gl_FragColor = VEC4";
+
+// Different ways to produce a vec4
+VEC4 = ["gl_Position", "gl_FragCoord", "vec4(EXPF, EXPF, EXPF, EXPF)", "(VEC4 * EXP)", "(VEC4 / EXP)", "(VEC4 + VEC4)", "(VEC4 - VEC4)", "FUNC1TTO1T(VEC4)", "FUNC2TTO1T(VEC4, VEC4)"];
+
+// Expressions producing a float or a vec4
+EXP = ["EXPF", "VEC4"];
+
+// Expressions producing a float
+EXPF = ["FUNC1TTO1T(EXPF)", "FUNC2TTO1T(EXPF, EXPF)", "(EXPF + EXPF)", "(EXPF - EXPF)", "(EXPF * EXPF)", "(EXPF / EXPF)", "iGlobalTime", "iFrame", "iMouse.x", "iMouse.y", "gl_PointCoord.x", "gl_PointCoord.y", "FLOAT"];
+
+// Functions transforming 1 thing (float / vec) into 1 thing
+FUNC1TTO1T = ["radians(EXPF)", "degrees(EXPF)", "sin(EXPF)", "cos(EXPF)", "tan(EXPF)", "asin(EXPF)", "acos(EXPF)", "atan(EXPF)", "exp(EXPF)", "log(EXPF)", "exp2(EXPF)", "log2(EXPF)", "sqrt(EXPF)", "inversesqrt(EXPF)", "abs(EXPF)", "sign(EXPF)", "floor(EXPF)", "ceil(EXPF)", "fract(EXPF)", "normalize(EXPF)"];
+
+// Functions transforming 2 things into 1 thing
+FUNC2TTO1T = ["atan(EXPF, EXPF)", "pow(EXPF, EXPF)", "mod(EXPF, EXPF)", "min(EXPF, EXPF)", "max(EXPF, EXPF)", "step(EXPF, EXPF)", "reflect(EXPF, EXPF)"];
+
+pick = function(arr){
+  return arr[Math.floor(Math.random()*arr.length)];
+}
+
+onload = function(){
+
+  while(1){
+    oldseed = seed;
+    seed = seed.replace(/VEC4/g, function(){return pick(VEC4)});
+    console.log(seed);
+    seed = seed.replace(/EXPF/g, function(){return pick(EXPF)});
+    console.log(seed);
+    seed = seed.replace(/EXP(?!F)/g, function(){return pick(EXP)});
+    console.log(seed);
+    seed = seed.replace(/FUNC1TTO1T/g, function(){return pick(FUNC1TTO1T)});
+    console.log(seed);
+    seed = seed.replace(/FUNC2TTO1T/g, function(){return pick(FUNC2TTO1T)});
+    console.log(seed);
+    seed = seed.replace(/FLOAT/g, function(){return Math.floor(Math.random()*10) + "." + Math.floor(Math.random()*10)});
+    console.log(seed);
+    if(oldseed == seed){
+      break;
+    }
+    
+    // Reset seed if it's too simple
+    if(seed == "gl_FragColor = gl_Position" || seed == "gl_FragColor = gl_FragCoord"){
+      seed = "gl_FragColor = VEC4";
+    }
+  }
+}
+
+
+</script>
