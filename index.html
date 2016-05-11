@@ -4,16 +4,16 @@
 /** Random WebGL Fragment Shader Generator **/
 
 // The fragment sets gl_FragColor
-seed = "gl_FragColor = VEC4";
+seed = "fragColor = VEC4;";
 
 // Different ways to produce a vec4
-VEC4 = ["gl_Position", "gl_FragCoord", "vec4(EXPF, EXPF, EXPF, EXPF)", "(VEC4 * EXP)", "(VEC4 / EXP)", "(VEC4 + VEC4)", "(VEC4 - VEC4)", "FUNC1TTO1T(VEC4)", "FUNC2TTO1T(VEC4, VEC4)"];
+VEC4 = ["vec4(EXPF, EXPF, EXPF, EXPF)", "(VEC4 * EXP)", "(VEC4 / EXP)", "(VEC4 + VEC4)", "(VEC4 - VEC4)", "FUNC1TTO1T(VEC4)", "FUNC2TTO1T(VEC4, VEC4)"];
 
 // Expressions producing a float or a vec4
 EXP = ["EXPF", "VEC4"];
 
 // Expressions producing a float
-EXPF = ["FUNC1TTO1T(EXPF)", "FUNC2TTO1T(EXPF, EXPF)", "(EXPF + EXPF)", "(EXPF - EXPF)", "(EXPF * EXPF)", "(EXPF / EXPF)", "iGlobalTime", "iFrame", "iMouse.x", "iMouse.y", "gl_PointCoord.x", "gl_PointCoord.y", "FLOAT"];
+EXPF = ["FUNC1TTO1T(EXPF)", "FUNC2TTO1T(EXPF, EXPF)", "(EXPF + EXPF)", "(EXPF - EXPF)", "(EXPF * EXPF)", "(EXPF / EXPF)", "iGlobalTime", "float(iFrame)", "(iMouse.x / iResolution.x)", "(iMouse.y / iResolution.y)", "(gl_FragCoord.x / iResolution.x)", "(gl_FragCoord.y / iResolution.y)", "FLOAT"];
 
 // Functions transforming 1 thing (float / vec) into 1 thing
 FUNC1TTO1T = ["radians", "degrees", "sin", "cos", "tan", "asin", "acos", "atan", "exp", "log", "exp2", "log2", "sqrt", "inversesqrt", "abs", "sign", "floor", "ceil", "fract", "normalize"];
@@ -25,33 +25,34 @@ pick = function(arr){
   return arr[Math.floor(Math.random()*arr.length)];
 }
 
-onload = function(){
+onload = generate = function(){
 
-  while(1){
-    oldseed = seed;
-    seed = seed.replace(/VEC4/g, function(){return pick(VEC4)});
-    //console.log(seed);
-    seed = seed.replace(/EXPF/g, function(){return pick(EXPF)});
-    //console.log(seed);
-    seed = seed.replace(/EXP(?!F)/g, function(){return pick(EXP)});
-    //console.log(seed);
-    seed = seed.replace(/FUNC1TTO1T/g, function(){return pick(FUNC1TTO1T)});
-    //console.log(seed);
-    seed = seed.replace(/FUNC2TTO1T/g, function(){return pick(FUNC2TTO1T)});
-    //console.log(seed);
-    seed = seed.replace(/FLOAT/g, function(){return Math.floor(Math.random()*10) + "." + Math.floor(Math.random()*10)});
-    //console.log(seed);
-    if(oldseed == seed){
-      break;
-    }
-    
-    // Reset seed if it's too simple
-    if(seed == "gl_FragColor = gl_Position" || seed == "gl_FragColor = gl_FragCoord"){
-      seed = "gl_FragColor = VEC4";
-    }
+  oldseed = seed;
+  
+  seed = seed.replace(/VEC4/g, function(){return pick(VEC4)});
+  //console.log(seed);
+  seed = seed.replace(/EXPF/g, function(){return (Math.random() > 0.5 ? pick(EXPF) : "FLOAT")});
+  //console.log(seed);
+  seed = seed.replace(/EXP(?!F)/g, function(){return pick(EXP)});
+  //console.log(seed);
+  seed = seed.replace(/FUNC1TTO1T/g, function(){return pick(FUNC1TTO1T)});
+  //console.log(seed);
+  seed = seed.replace(/FUNC2TTO1T/g, function(){return pick(FUNC2TTO1T)});
+  //console.log(seed);
+  seed = seed.replace(/FLOAT/g, function(){return Math.floor(Math.random()*2) + "." + Math.floor(Math.random()*10)});
+  //console.log(seed);
+
+  
+  // Reset seed if it's too simple or too long
+  if(seed == "fragColor = gl_Position" || seed == "fragColor = gl_FragCoord"|| seed.length > 1000){
+    seed = "fragColor = VEC4;";
   }
   
-  document.write(seed);
+  document.body.innerHTML = seed;
+  
+  if(oldseed != seed || seed == "fragColor = VEC4;"){
+    setTimeout(generate, 50);
+  }
 }
 
 
