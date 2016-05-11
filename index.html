@@ -48,7 +48,7 @@ onload = generate = function(){
     seed = "fragColor = VEC4;";
   }
   
-  document.body.innerHTML = seed;
+  document.body.innerHTML = "<pre>// Paste this code in <a href=//shadertoy.com/new>shadertoy.com/new</a>\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord){\n  " + seed + "\n}";
   
   if(oldseed != seed || seed == "fragColor = VEC4;"){
     setTimeout(generate, 50);
