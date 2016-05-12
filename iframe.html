@@ -37,7 +37,7 @@
     seed = seed.replace(/FLOAT/g, function(){return Math.floor(Math.random()*2) + "." + Math.floor(Math.random()*10)});
 
     // Reset seed if it's too simple or too long
-    if(seed .length < 30 || seed.length > 5000){
+    if(seed .length < 50 || seed.length > 10000){
       seed = "fragColor = VEC4;";
     }
     
@@ -55,9 +55,6 @@
       
       // Get canvas WebGL context
       g=a.getContext("webgl");
-
-      // Mouse coordinates
-      M=[0,0];
 
       // Define a new program
       P=g.createProgram();
