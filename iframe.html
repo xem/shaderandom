@@ -1,12 +1,13 @@
 <meta charset=utf-8>
 <body style="margin: 0; font-size: 10px; font-family: monospace;">
+<a id=link style="background:#fff; position: fixed; top: 0; right: 0; font-size: 20px;">#</a>
 <pre id=p></pre>
 <canvas id=a width=640 height=360 style="width:99%; height: 85%"></canvas>
 <script>
   /**  Random WebGL Fragment Shader Generator **/
   
   // The fragment sets gl_FragColor
-  seed = "fragColor = VEC4;";
+  seed = atob(location.hash.slice(1)) || "fragColor = VEC4;";
   
   // Different ways to produce a vec4
   VEC4 = ["vec4(EXPF, EXPF, EXPF, EXPF)", /*"(VEC4 * EXP)", "(VEC4 / EXP)", "(VEC4 + VEC4)", "(VEC4 - VEC4)",*/ "FUNC1TTO1T(VEC4)", "FUNC2TTO1T(VEC4, VEC4)"];
@@ -47,8 +48,11 @@
       setTimeout(generate);
     }
     
+    
     // End of the random generation: shader preview
     else{
+    
+      link.href="#" + btoa(seed);
     
       /** Shadertoy-compatible shader preview **/
       
@@ -67,7 +71,6 @@
       g.attachShader(P,S);
       
       // Main program
-      console.log("precision mediump float;uniform float iGlobalTime, iFrame;uniform vec2 iResolution;void main(){"+seed+"}");
       g.shaderSource(S=g.createShader(g.FRAGMENT_SHADER),"precision mediump float;uniform float iGlobalTime, iFrame;uniform vec2 iResolution;void main(){"+seed.replace("fragColor", "gl_FragColor")+"}");
 
       // Compile and attach it to the program
