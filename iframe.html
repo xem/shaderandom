@@ -1,8 +1,8 @@
 <meta charset=utf-8>
 <body style="margin: 0; font-size: 10px; font-family: monospace;">
 <a id=link style="background:#fff; position: fixed; top: 0; right: 0; font-size: 20px;">#</a>
-<pre id=p></pre>
-<canvas id=a width=640 height=360 style="width:99%; height: 85%"></canvas>
+<input id=p style="width:95%">
+<canvas id=a width=640 height=360 style="width:99%; height: 85%; background: #222"></canvas>
 <script>
   /**  Random WebGL Fragment Shader Generator **/
   
@@ -15,11 +15,11 @@
   // Expressions producing a float or a vec4
   EXP = ["EXPF", "VEC4"];
   
-  // Expressions producing a float
-  EXPF = ["FUNC1TTO1T(EXPF)", "FUNC2TTO1T(EXPF, EXPF)", "(EXPF + EXPF)", /*"(EXPF - EXPF)", */"(EXPF * EXPF)", "(EXPF / EXPF)", "iGlobalTime", "float(iFrame)", "(gl_FragCoord.x / iResolution.x)", "(gl_FragCoord.y / iResolution.y)", "FLOAT"];
+  // Expressions producing a float (more chances to have time-based results)
+  EXPF = ["float(iFrame)", "float(iFrame)", "iGlobalTime", "FLOAT/sin(iGlobalTime)", "FUNC1TTO1T(EXPF)", "FUNC2TTO1T(EXPF, EXPF)", "(EXPF + EXPF)", "(EXPF - EXPF)", "(EXPF * EXPF)", "(EXPF / EXPF)", "(gl_FragCoord.x / iResolution.x)", "(gl_FragCoord.y / iResolution.y)", "FLOAT"];
   
-  // Functions transforming 1 thing (float / vec) into 1 thing
-  FUNC1TTO1T = ["radians", "degrees", "sin", "cos", "tan", "asin", "acos", "atan", "exp", "log", "exp2", "log2", "sqrt", "inversesqrt", "abs", "sign", "floor", "ceil", "fract", "normalize"];
+  // Functions transforming 1 thing (float / vec) into 1 thing (more chances to have sin/cos)
+  FUNC1TTO1T = ["sin", "cos", "sin", "cos", "radians", "degrees", "tan", "asin", "acos", "atan", "exp", "log", "exp2", "log2", "sqrt", "inversesqrt", "abs", "sign", "floor", "ceil", "fract", "normalize"];
   
   // Functions transforming 2 things into 1 thing
   FUNC2TTO1T = ["atan", "pow", "mod", "min", "max", "step", "reflect"];
@@ -27,23 +27,27 @@
   pick = function(arr){
     return arr[Math.floor(Math.random()*arr.length)];
   }
-
+  
   onload = generate = function(){
+  
+    a.width = innerWidth;
+    a.height = innerHeight;
+  
     oldseed = seed;
     seed = seed.replace(/VEC4/g, function(){return pick(VEC4)});
-    seed = seed.replace(/EXPF/g, function(){return (Math.random() > 0.25 ? pick(EXPF) : "FLOAT")});
+    seed = seed.replace(/EXPF/g, function(){return (Math.random() > 0.5 ? pick(EXPF) : "FLOAT")});
     seed = seed.replace(/EXP(?!F)/g, function(){return pick(EXP)});
     seed = seed.replace(/FUNC1TTO1T/g, function(){return pick(FUNC1TTO1T)});
     seed = seed.replace(/FUNC2TTO1T/g, function(){return pick(FUNC2TTO1T)});
-    seed = seed.replace(/FLOAT/g, function(){return Math.floor(Math.random()*3) + "." + Math.floor(Math.random()*10)});
+    seed = seed.replace(/FLOAT/g, function(){return Math.floor(Math.random()*5) + "." + Math.floor(Math.random()*10)});
+    
 
     // Reset seed if it's too simple or too long
-    if(seed.length < 50 || seed.length > 6000){
+    if((oldseed == seed && seed.length < 90) || seed.length > 10000){
       seed = "fragColor = VEC4;";
     }
     
     // Write to page
-    p.innerHTML = "<pre>void mainImage(out vec4 fragColor, in vec2 fragCoord){" + seed + "}";
     if(oldseed != seed || seed == "fragColor = VEC4;"){
       setTimeout(generate);
     }
@@ -52,6 +56,8 @@
     // End of the random generation: shader preview
     else{
     
+      p.value = "void mainImage(out vec4 fragColor, in vec2 fragCoord){" + seed + "}";
+      
       link.href="#" + btoa(seed);
     
       /** Shadertoy-compatible shader preview **/
