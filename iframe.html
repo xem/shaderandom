@@ -1,6 +1,6 @@
 ﻿<pre><a id=l></a><p><canvas id=a style=width:90%;height:80%>
 <script>
-s=decodeURI(location.hash.slice(1))||"fragColor=A;";
+s=decodeURI(location.hash.slice(1))||"fragColor=A";
 A=["vec4(K,K,K,K)","(A+A)","(A*B)","(A/B)","(A-A)","D(A)","E(A,A)"];
 B="KA";
 K=["float(iFrame)","iGlobalTime","Z/sin(iGlobalTime)","D(K)","E(K,K)","(K+K)","(K-K)","(K*K)","(K/K)","(gl_FragCoord.x/iResolution.x)","(gl_FragCoord.y/iResolution.y)","Z"];
@@ -10,32 +10,29 @@ p=z=>z[~~(Math.random()*z.length)];
 (G=z=>{
 a.width=a.height=900;
 o=s;
-s=s.replace(/A/g,z=> p(A)).replace(/K/g,z=>Math.random()>.5?p(K):"Z").replace(/B(?!F)/g,z=>p(B)).replace(/D/g,z=>p(D)).replace(/E/g,z=>p(E)).replace(/Z/g,z=>(Math.random()*9).toFixed(2));
+s=s.replace(/A/g,z=>p(A)).replace(/K/g,z=>Math.random()>.5?p(K):"Z").replace(/B(?!F)/g,z=>p(B)).replace(/D/g,z=>p(D)).replace(/E/g,z=>p(E)).replace(/Z/g,z=>(Math.random()*9).toFixed(2));
 if((o==s&&s.length<90)||s.length>2e3)s="fragColor=A;";
 if(o!=s||s.length<30)setTimeout(G,1)
 else{
-l.href="#"+(l.innerHTML=s).replace(/\(/g,"%28").replace(/\)/g,"%29").replace(";","%3B");
-for(i in g=a.getContext(`webgl`)){
-  g[i[0]+i[6]]=g[i];
-}
-with(g){
-P=cP();
-sS(S=cS(VERTEX_SHADER),"attribute vec2 P;void main(){gl_Position=vec4(P,0,1);}");
-ce(S);
-aS(P,S);
-sS(S=cS(FN),"precision mediump float;uniform float iGlobalTime,iFrame;uniform vec2 iResolution;void main(){"+s.replace("fragColor", "gl_FragColor")+"}");
-ce(S);
-aS(P,S);
-lo(P);
-ug(P);
-bf(B=ARRAY_BUFFER,cB());
-eV(0);
-vA(0,2,BYTE,0,0,0);
-bD(B,new Int8Array([-3,1,1,-3,1,1]),STATIC_DRAW);
-T=0;
-F=0;
-setInterval(Z=>uniform1f(gf(P,"iGlobalTime"),T+=.016),uniform1f(gf(P,"iFrame"),F++),uniform2f(gf(P,"iResolution"),900,900),dr(TRIANGLE_FAN,0,3),9);
-}
+l.href="#"+(l.innerHTML=s).replace(/\(/g,"%28").replace(/\)/g,"%29")
+for(i in g=a.getContext`webgl`)g[i[0]+i[6]]=g[i];
+with(g)
+P=cP(),
+sS(S=cS(VERTEX_SHADER),"attribute vec2 P;void main(){gl_Position=vec4(P,0,1);}"),
+ce(S),
+aS(P,S),
+sS(S=cS(FN),"precision mediump float;uniform float iGlobalTime,iFrame;uniform vec2 iResolution;void main(){"+s.replace("fragColor", "gl_FragColor")+";}"),
+ce(S),
+aS(P,S),
+lo(P),
+ug(P),
+bf(B=ARRAY_BUFFER,cB()),
+eV(0),
+vA(0,2,BYTE,0,0,0),
+bD(B,new Int8Array([-3,1,1,-3,1,1]),STATIC_DRAW),
+T=0,
+F=0,
+setInterval(Z=>uniform1f(gf(P,"iGlobalTime"),T+=.016),uniform1f(gf(P,"iFrame"),F++),uniform2f(gf(P,"iResolution"),900,900),dr(TRIANGLE_FAN,0,3),9)
 }
 })()
 </script>
