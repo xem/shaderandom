@@ -86,9 +86,9 @@ P = b => b[Math.random() * b.length | 0];
      .replace(/Z/g, b => (9 * Math.random()).toFixed(2));
          
     // Reset the whole shader generation:
-    // - if the replaces didn't have any effect (o == s), and the shader's code is too short to be interesting (s.length < 300),
+    // - if the replaces didn't have any effect (o == s), and the shader's code is too short to be interesting (s.length < 500),
     // - or if the shader generation didn't converge to a final string in less than 20000 chars.
-    if((o == s && 300 > s.length) || 2e4 < s.length){
+    if((o == s && 500 > s.length) || 2e4 < s.length){
       s = `ragColor=A;`;
     }
      
@@ -106,7 +106,7 @@ P = b => b[Math.random() * b.length | 0];
       with(g){
       
         // Fill the textarea with the shader surrounded by a mainImage function that works on Shadertoy.
-        l.value = `void mainImage(out vec4 fragColor,vec2 C){f${s}}`,
+        l.value = `void mainImage(out vec4 fragColor,vec2 C){\n  f${s}\n}`,
         
         // createProgram
         P = cP(),
@@ -192,6 +192,5 @@ P = b => b[Math.random() * b.length | 0];
 
 )()
 
-/* GOLF END */
 
 </script>
