@@ -1,0 +1,197 @@
+﻿<body id=b style=margin:0>
+<canvas id=a width=900 height=900></canvas>
+<script>
+
+d = document;
+g = a.getContext("webgl");
+
+// ==============
+// Shaderandom 1k
+// ==============
+
+// Based on http://github.com/xem/shaderandom (xem, 2016).
+// Also based on these WebGL golfing techniques http://xem.github.io/articles/#webgl_quest (CodeGolf Team, 2017).
+
+// This demo generates a random WebGL shader, plays it, and displays a source code that can be copy-pasted on shadertoy.com.
+
+// All the WebGL methods and constants we need are hashed in order to access them with only 2 letters:
+// createProgram => cP
+// shaderSource => sS
+// createShader => cS
+// compileShader => ce
+// attachShader => aS
+// linkProgram => lo
+// useProgram => ug
+// bindBuffer => bf
+// createBuffer => cB
+// enableVertexAttribArray => eV
+// vertexAttribPointer => vA
+// bufferData => bD
+// getUniformLocation => gf
+// drawArrays => dr
+// FRAGMENT_SHADER => FN (value: 35632)
+// ELEMENT_ARRAY_BUFFER_BINDING => ET (value: 34965)
+
+// Also, b.bgColor is set to 0 to give the body a black background.
+
+for(i in g){
+  g[i[b.bgColor = 0] + i[6]] = g[i];
+}
+
+// Resize the canvas in CSS.
+a.style = `width:100vw;height:80vh;box-sizing:border-box`;
+
+// Add a textarea called l under the canvas.
+d.write`<textarea id=l style=width:100vw;height:20vh;margin:0>`;
+
+// Initialize the shader:
+// The seed is "ragColor=A".
+// The A will be replaced by random WebGL code.
+// The whole string will be prepended with "gl_F" to be played in the demo (gl_Fragcolor=...).
+// and prepended with "f" in the textarea to be vompatible with Shadertoy (fragColor=...).
+s = `ragColor=A;`;
+
+// P is the function that picks an item in an array, randomly.
+P = b => b[Math.random() * b.length | 0];
+
+// S is the function that generates the shader, randomly and recursively. It's surrounded by "(...)()" to be called immediately.
+(
+  
+  S = b => {
+    
+    // Backup the current value of the string "s" in "o".
+    o = s;
+    
+    // Update s:
+    s =
+    
+    // Replace every occurrence of A with a vec4() containing 4 numbers, or an operation involving one vec4 ("D(A)" / "A*B") or two vec4's ("A+A" / "A*B" / "A-A" / "E(A,A)") .
+    s.replace(/A/g, b => P(`vec4(K,K,K,K) (A+A) (A*B) (A/B) (A-A) D(A) E(A,A)`.split` `))
+    
+    // Replace every occurrence of K with an operation involving shader variables ("float(iFrame)" / "iTime" / "Z/sin(iTime)" / "(gl_FragCoord.x/iResolution.x)" / "(gl_FragCoord.y/iResolution.y)"),
+    // or an operation involving two "K"'s ("E(K,K)" / "(K+K)" / "(K-K)" / "(K*K)" / "(K/K)"),
+    // or a float ("Z")
+     .replace(/K/g, P(`float(iFrame) iTime Z/sin(iTime) D(K) E(K,K) (K+K) (K-K) (K*K) (K/K) (gl_FragCoord.x/iResolution.x) (gl_FragCoord.y/iResolution.y) Z`.split` `))
+     
+    // Replace every occurrence of B with "K" or "A".
+     .replace(/B/g,b => P(`K A`.split` `))
+     
+     // Replace every occurrence of D with a Math operation involving one number ("sin" / "cos" / "sin" / "cos" / "radians" / "degrees" / "tan" / "asin" / "acos" / "atan" / "exp" / "log" / "exp2" / "log2" / "sqrt" / "inversesqrt" / "abs" / "sign" / "floor" / "ceil" / "fract" / "normalize").
+     .replace(/D/g, b => P(`sin cos sin cos radians degrees tan asin acos atan exp log exp2 log2 sqrt inversesqrt abs sign floor ceil fract normalize`.split` `))
+     
+     // Replace every occurrence of E with a Math operation involving two numbers ("atan" / "pow" / "mod" / "min" / "max" / "step" / "reflect").
+     .replace(/E/g, b => P(`atan pow mod min max step reflect`.split` `))
+     
+     // Replace every occurrence of Z with a float between 0 and 9. 
+     .replace(/Z/g, b => (9 * Math.random()).toFixed(2));
+         
+    // Reset the whole shader generation:
+    // - if the replaces didn't have any effect (o == s), and the shader's code is too short to be interesting (s.length < 300),
+    // - or if the shader generation didn't converge to a final string in less than 20000 chars.
+    if((o == s && 300 > s.length) || 2e4 < s.length){
+      s = `ragColor=A;`;
+    }
+     
+    // If the replaces had an effect (o != s) or if the seed was just reset: 
+    if(o != s || `ragColor=A;` == s){
+      
+      // Restart S(), recursively, to replace every occurrence of A/K/B/D/E/Z that may remain.
+      S();
+    }
+     
+    // Else if the string has converged in a "good" shader (in terms of size):
+    else {
+    
+      // Make the WebGL context "g" implicit.
+      with(g){
+      
+        // Fill the textarea with the shader surrounded by a mainImage function that works on Shadertoy.
+        l.value = `void mainImage(out vec4 fragColor,vec2 C){f${s}}`,
+        
+        // createProgram
+        P = cP(),
+        
+        // S = createShader(VERTEX_SHADER)
+        // VERTEX_SHADER == 35633 == FRAGMENT_SHADER + 1 == FN + 1.
+        // shaderSource(S, "(code that initializes gl_Position")) 
+        sS(S = cS(FN + 1),`attribute vec2 P;void main(){gl_Position=vec4(P,0,1);}`),
+        
+        // compileShader(S)
+        ce(S),
+        
+        // attachShader(P, S)
+        aS(P, S),
+        
+        // S = createShader(FRAGMENT_SHADER)
+        // shaderSource(S, "(code that initializes the shader inputs iTime, iFrame, iResolution and executes s in the main() function)")
+        sS(S = cS(FN), `precision mediump float;uniform float iTime,iFrame;uniform vec2 iResolution;void main(){gl_F${s}}`),
+        
+        // compileShader(S)
+        ce(S),
+        
+        // attachShader(P, S)
+        aS(P,S),
+        
+        // linkProgram(P)
+        lo(P),
+        
+        // useProgram(P)
+        ug(P),
+        
+        // B = ARRAY_BUFFER === 34962 === ELEMENT_ARRAY_BUFFER_BINDING - 3 === ET - 3 
+        // bindBuffer(B, createBuffer())
+        bf(B = ET - 3, cB()),
+        
+        // enableVertexAttribArray(0)
+        eV(0),
+        
+        // vertexAttribPointer(0, 2, BYTE = 5120, 0, 0, 0)
+        // Params:
+        // - vertex index: 0
+        // - components per vertex attribute: 2
+        // - vertex attributes type: BYTE
+        // - normalized: 0
+        // - stride: 1
+        // - offset: 0
+        vA(0, 2, 5120, 0, 1, 0),
+        
+        // [1,B],[B,1],[1,1] are the coordinates of a big triangle surrounding the canvas.
+        // These coordinates are put in an Int8Array using Int8Array.of(1,B,1,1).
+        // Note: the pairs of coordinates are written with an overlap of size 1, which corresponds to the stride defined above.
+        // STATIC_DRAW = 35044 = ARRAY_BUFFER + 82 = B + 82.
+        // bufferData(Int8Array.of(1, B, 1, 1), B + 82)
+        bD(B, Int8Array.of(1, B, 1, 1), B + 82),
+        
+        // Reset the frame counter F and the time counter T
+        F = T = 0,
+        
+        // Loop every 9ms:
+        setInterval(
+          
+          b => {
+            
+            // Update T and feed it to the shader program as "iTime".
+            // uniform1f(getUniformLocation(P, 'iTime'), T += .01)
+            uniform1f(gf(P, `iTime`), T += .01);
+            
+            // Update F and feed it to P as "iFrame".
+            uniform1f(gf(P, `iFrame`), F++);
+            
+            // Feed the resolution of the canvas (900x900) to P.
+            uniform2f(gf(P, `iResolution`), 900, 900);
+            
+            // Redraw the triangle with these new values for iTime and iFrame.
+            // drawArrays(TRIANGLE_FAN = 6, first = 0, count = 3)
+            dr(6, 0, 3)
+
+          }, 9
+        )
+      }
+    }
+  }
+
+)()
+
+/* GOLF END */
+
+</script>
