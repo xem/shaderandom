@@ -42,7 +42,7 @@ for(i in g){
 a.style = `width:100vw;height:80vh;box-sizing:border-box`;
 
 // Add a textarea called l under the canvas.
-d.write`<textarea id=l style=width:100vw;height:20vh;margin:0>`;
+d.write`<textarea id=l style=width:100vw;height:20vh;margin:0;font-size:9px>`;
 
 // Initialize the shader:
 // The seed is "ragColor=A".
@@ -74,7 +74,7 @@ P = b => b[Math.random() * b.length | 0];
      .replace(/K/g, P(`float(iFrame) iTime Z/sin(iTime) D(K) E(K,K) (K+K) (K-K) (K*K) (K/K) (gl_FragCoord.x/iResolution.x) (gl_FragCoord.y/iResolution.y) Z`.split` `))
      
     // Replace every occurrence of B with "K" or "A".
-     .replace(/B/g,b => P(`K A`.split` `))
+     .replace(/B/g, b => P(`K A`.split` `))
      
      // Replace every occurrence of D with a Math operation involving one number ("sin" / "cos" / "sin" / "cos" / "radians" / "degrees" / "tan" / "asin" / "acos" / "atan" / "exp" / "log" / "exp2" / "log2" / "sqrt" / "inversesqrt" / "abs" / "sign" / "floor" / "ceil" / "fract" / "normalize").
      .replace(/D/g, b => P(`sin cos sin cos radians degrees tan asin acos atan exp log exp2 log2 sqrt inversesqrt abs sign floor ceil fract normalize`.split` `))
